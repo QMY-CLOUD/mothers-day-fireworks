@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>母亲节快乐</title>
+<style>
+  :root {
+    --bg-deep: #070618;
+    --bg-mid: #0f0a28;
+    --gold: #f4c542;
+    --rose: #e8848a;
+    --pink: #f098a0;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    background: radial-gradient(ellipse at 50% 30%, #1a1040 0%, #0a0820 50%, #050515 100%);
+    font-family: "KaiTi", "STKaiti", "楷体", "SimSun", serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .stars {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .star {
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+    animation: twinkle var(--dur) ease-in-out infinite;
+    animation-delay: var(--delay);
+    opacity: 0;
+  }
+
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.2; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.8); }
+  }
+
+  .text-stage {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 3;
+  }
+
+  .message {
+    font-size: clamp(20px, 5vw, 36px);
+    font-weight: bold;
+    text-align: center;
+    line-height: 1.6;
+    padding: 0 20px;
+    background: linear-gradient(90deg, #ff6b6b, #ffa64d, #ffe359, #6bce6b, #6bb5ff, #c06bff, #ff6b6b);
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: none;
+    filter: drop-shadow(0 0 12px rgba(255,180,180,0.6));
+    opacity: 0;
+    transform: translateY(20px) scale(0.9);
+    animation: textReveal 3s cubic-bezier(0.22, 0.61, 0.36, 1) 4.2s forwards;
+    animation-play-state: paused;
+  }
+
+  .message.show {
+    animation-play-state: running;
+  }
+
+  @keyframes textReveal {
+    0% { opacity: 0; transform: translateY(20px) scale(0.9); filter: blur(8px); }
+    15% { opacity: 1; transform: translateY(0) scale(1.02); filter: blur(0); }
+    25% { transform: translateY(-4px) scale(1); }
+    100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+  }
+
+  @keyframes rainbowShift {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 300% 50%; }
+  }
+
+  .message.show {
+    animation: textReveal 3s cubic-bezier(0.22, 0.61, 0.36, 1) 0s forwards,
+               rainbowShift 4s linear 0.3s infinite;
+  }
+
+  .heart-stage {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 4;
+    opacity: 0;
+    transition: opacity 1s ease;
+  }
+
+  .heart-stage.show {
+    opacity: 1;
+  }
+
+  .heart-svg {
+    animation: heartbeat 0.8s ease-in-out infinite;
+  }
+
+  @keyframes heartbeat {
+    0% { transform: scale(1); }
+    14% { transform: scale(1.15); }
+    28% { transform: scale(1); }
+    42% { transform: scale(1.1); }
+    56% { transform: scale(1); }
+    70% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+  }
+
+  .hint {
+    position: fixed;
+    bottom: 40px;
+    width: 100%;
+    text-align: center;
+    color: rgba(255,255,255,0.4);
+    font-size: 14px;
+    z-index: 5;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.8s;
+  }
+
+  .hint.show {
+    opacity: 1;
+  }
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+<canvas id="canvas"></canvas>
+
+<div class="text-stage">
+  <div class="message" id="message">祝妈妈母亲节快乐<br>永远年轻美丽！</div>
+</div>
+
+<div class="heart-stage" id="heartStage">
+  <svg class="heart-svg" width="140" height="130" viewBox="0 0 140 130">
+    <defs>
+      <radialGradient id="heartGlow" cx="50%" cy="40%" r="50%">
+        <stop offset="0%" stop-color="#ff9eb5"/>
+        <stop offset="60%" stop-color="#e8486a"/>
+        <stop offset="100%" stop-color="#c03050"/>
+      </radialGradient>
+      <filter id="glow">
+        <feGaussianBlur stdDeviation="4" result="blur"/>
+        <feMerge>
+          <feMergeNode in="blur"/>
+          <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+      </filter>
+    </defs>
+    <path d="M70,118 C26,82 2,58 2,32 C2,12 18,0 36,0 C48,0 58,8 70,22 C82,8 92,0 104,0 C122,0 138,12 138,32 C138,58 114,82 70,118Z"
+          fill="url(#heartGlow)" filter="url(#glow)"/>
+  </svg>
+</div>
+
+<div class="hint" id="hint">轻触屏幕重播</div>
+
+<script>
+(function() {
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+  const message = document.getElementById('message');
+  const heartStage = document.getElementById('heartStage');
+  const hint = document.getElementById('hint');
+  const starsContainer = document.getElementById('stars');
+
+  let W, H;
+  let fireworks = [];
+  let particles = [];
+  let trails = [];
+  let animationId;
+  let stage = 'idle';
+  let stageStartTime = 0;
+  let fireworkCount = 0;
+  let textShown = false;
+  let heartShown = false;
+
+  function resize() {
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  function createStars() {
+    const frag = document.createDocumentFragment();
+    for (let i = 0; i < 120; i++) {
+      const star = document.createElement('div');
+      star.className = 'star';
+      const size = Math.random() * 2.5 + 0.5;
+      star.style.cssText =
+        'left: ' + (Math.random() * 100) + '%;' +
+        'top: ' + (Math.random() * 70) + '%;' +
+        'width: ' + size + 'px;' +
+        'height: ' + size + 'px;' +
+        '--dur: ' + (Math.random() * 2 + 1.5) + 's;' +
+        '--delay: ' + (Math.random() * 3) + 's;';
+      frag.appendChild(star);
+    }
+    starsContainer.appendChild(frag);
+  }
+  createStars();
+
+  function createFirework(x, y, colors) {
+    const count = 80 + Math.floor(Math.random() * 60);
+    const parts = [];
+    for (let i = 0; i < count; i++) {
+      const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.3;
+      const speed = Math.random() * 6 + 2;
+      const life = 1.2 + Math.random() * 1.5;
+      parts.push({
+        x: x, y: y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        life: life,
+        maxLife: life,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        size: Math.random() * 2.5 + 0.8
+      });
+    }
+    return parts;
+  }
+
+  function launchFirework() {
+    const x = W * 0.15 + Math.random() * W * 0.7;
+    const y = H * 0.15 + Math.random() * H * 0.35;
+    const palettes = [
+      ['#ff6b6b', '#ff8e8e', '#ffaaaa', '#ffd93d'],
+      ['#ffa64d', '#ffc97a', '#ffe0a0', '#ff6b6b'],
+      ['#c06bff', '#da8fff', '#f0c0ff', '#6bb5ff', '#ffd93d']
+    ];
+    const palette = palettes[fireworkCount % 3];
+    const startX = x;
+    const startY = H + 20;
+    const trailP = {
+      x: startX, y: startY,
+      targetX: x, targetY: y,
+      progress: 0,
+      speed: 0.015 + Math.random() * 0.02,
+      life: 0.6 + Math.random() * 0.4
+    };
+    trails.push({
+      trail: trailP,
+      particles: createFirework(x, y, palette)
+    });
+  }
+
+  function createFloatingParticle() {
+    return {
+      x: Math.random() * W,
+      y: -10,
+      vx: (Math.random() - 0.5) * 1.5,
+      vy: Math.random() * 1.5 + 0.5,
+      size: Math.random() * 5 + 3,
+      rotation: Math.random() * 360,
+      rotSpeed: (Math.random() - 0.5) * 3,
+      opacity: Math.random() * 0.6 + 0.4,
+      type: Math.random() > 0.5 ? 'petal' : 'star',
+      color: Math.random() > 0.5 ? '#ffb3c6' : '#ffd93d',
+      wobble: Math.random() * Math.PI * 2,
+      wobbleSpeed: Math.random() * 0.02 + 0.01,
+      wobbleAmp: Math.random() * 1.5 + 0.5
+    };
+  }
+
+  function drawHeartParticle(ctx, p) {
+    ctx.save();
+    ctx.globalAlpha = p.opacity;
+    ctx.fillStyle = p.color;
+    ctx.translate(p.x, p.y);
+    ctx.rotate(p.rotation * Math.PI / 180);
+    if (p.type === 'star') {
+      const s = p.size;
+      ctx.beginPath();
+      ctx.moveTo(0, -s);
+      ctx.lineTo(s * 0.3, -s * 0.3);
+      ctx.lineTo(s, 0);
+      ctx.lineTo(s * 0.3, s * 0.3);
+      ctx.lineTo(0, s);
+      ctx.lineTo(-s * 0.3, s * 0.3);
+      ctx.lineTo(-s, 0);
+      ctx.lineTo(-s * 0.3, -s * 0.3);
+      ctx.closePath();
+      ctx.fill();
+    } else {
+      ctx.beginPath();
+      ctx.ellipse(0, 0, p.size * 0.5, p.size, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  function animate(timestamp) {
+    animationId = requestAnimationFrame(animate);
+    ctx.clearRect(0, 0, W, H);
+
+    if (stage === 'idle') return;
+
+    const elapsed = (timestamp - stageStartTime) / 1000;
+
+    if (stage === 'fireworks') {
+      if (fireworkCount < 3 && elapsed > fireworkCount * 1.0 + 0.3 && trails.length === 0) {
+        launchFirework();
+        fireworkCount++;
+      }
+      if (fireworkCount >= 3 && elapsed > 4.2 && !textShown) {
+        textShown = true;
+        message.classList.add('show');
+        stage = 'text';
+        stageStartTime = timestamp;
+      }
+    }
+
+    if (stage === 'text' && elapsed > 2.8 && !heartShown) {
+      heartShown = true;
+      heartStage.classList.add('show');
+      hint.classList.add('show');
+      stage = 'heart';
+      stageStartTime = timestamp;
+      for (let i = 0; i < 30; i++) {
+        const p = createFloatingParticle();
+        p.y = Math.random() * H;
+        particles.push(p);
+      }
+    }
+
+    for (let i = trails.length - 1; i >= 0; i--) {
+      const t = trails[i];
+      const tr = t.trail;
+      tr.progress += tr.speed;
+      if (tr.progress >= 1) {
+        fireworks.push({ particles: t.particles, time: 0 });
+        trails.splice(i, 1);
+        continue;
+      }
+      const eased = 1 - Math.pow(1 - tr.progress, 3);
+      const cx = tr.x + (tr.targetX - tr.x) * eased;
+      const cy = tr.y + (tr.targetY - tr.y) * eased;
+      ctx.fillStyle = '#ffd93d';
+      ctx.shadowColor = '#ffd93d';
+      ctx.shadowBlur = 8;
+      ctx.beginPath();
+      ctx.arc(cx, cy, 2, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    }
+
+    for (let i = fireworks.length - 1; i >= 0; i--) {
+      const fw = fireworks[i];
+      fw.time += 1 / 60;
+      let alive = false;
+      for (const p of fw.particles) {
+        p.x += p.vx * 0.7;
+        p.y += p.vy * 0.7;
+        p.vy += 0.04;
+        p.vx *= 0.99;
+        p.vy *= 0.99;
+        p.life -= 1 / 60;
+        if (p.life <= 0) continue;
+        alive = true;
+        const alpha = Math.min(1, p.life / p.maxLife);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = alpha;
+        ctx.shadowColor = p.color;
+        ctx.shadowBlur = 4;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size * alpha, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+      ctx.shadowBlur = 0;
+      if (!alive) fireworks.splice(i, 1);
+    }
+
+    if (stage === 'heart') {
+      if (Math.random() < 0.4) {
+        particles.push(createFloatingParticle());
+      }
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.y += p.vy;
+        p.x += p.vx + Math.sin(p.wobble) * p.wobbleAmp * 0.3;
+        p.wobble += p.wobbleSpeed;
+        p.rotation += p.rotSpeed;
+        if (p.y > H + 20 || p.x < -20 || p.x > W + 20) {
+          particles.splice(i, 1);
+        } else {
+          drawHeartParticle(ctx, p);
+        }
+      }
+      const glow = ctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, Math.min(W, H) * 0.35);
+      glow.addColorStop(0, 'rgba(255,120,150,0.06)');
+      glow.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = glow;
+      ctx.fillRect(0, 0, W, H);
+    }
+  }
+
+  function startSequence() {
+    fireworks = [];
+    trails = [];
+    particles = [];
+    fireworkCount = 0;
+    textShown = false;
+    heartShown = false;
+    message.classList.remove('show');
+    heartStage.classList.remove('show');
+    hint.classList.remove('show');
+    stage = 'fireworks';
+    stageStartTime = performance.now();
+    if (!animationId) {
+      animationId = requestAnimationFrame(animate);
+    }
+  }
+
+  resize();
+  startSequence();
+
+  document.addEventListener('click', function() {
+    if (stage === 'heart' || stage === 'text') {
+      startSequence();
+    }
+  });
+
+  document.addEventListener('touchstart', function(e) {
+    if (stage === 'heart' || stage === 'text') {
+      e.preventDefault();
+      startSequence();
+    }
+  }, { passive: false });
+
+  if (!animationId) {
+    animationId = requestAnimationFrame(animate);
+  }
+})();
+</script>
+</body>
+</html>
