@@ -374,7 +374,7 @@
     }
 
     // Stage: text → heart transition
-    if (stage === 'text' && elapsed > 2.5 && !heartShown) {
+    if (stage === 'text' && elapsed > 5.0 && !heartShown) {
       heartShown = true;
       message.classList.add('fade-out');
       heartStage.classList.add('show');
