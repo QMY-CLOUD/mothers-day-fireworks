@@ -6,11 +6,12 @@
 <title>母亲节快乐</title>
 <style>
   :root {
-    --bg-deep: #070618;
-    --bg-mid: #0f0a28;
-    --gold: #f4c542;
-    --rose: #e8848a;
-    --pink: #f098a0;
+    --peach: #f4b8a0;
+    --coral: #e8816a;
+    --rose: #e8a0b0;
+    --gold: #f0c060;
+    --warm-white: #fff8f3;
+    --soft-pink: #ffd4c4;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -20,8 +21,8 @@
     height: 100vh;
     height: 100dvh;
     overflow: hidden;
-    background: radial-gradient(ellipse at 50% 30%, #1a1040 0%, #0a0820 50%, #050515 100%);
-    font-family: "KaiTi", "STKaiti", "楷体", "SimSun", serif;
+    background: linear-gradient(175deg, #fef9f0 0%, #fef0e4 15%, #fde4d4 35%, #fcd8c8 55%, #fbd5cc 75%, #f8d8d0 100%);
+    font-family: "STKaiti", "KaiTi", "华文楷体", "楷体", "Noto Serif SC", "Source Han Serif SC", "SimSun", serif;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -38,7 +39,8 @@
     z-index: 1;
   }
 
-  .stars {
+  /* Firefly lights */
+  .fireflies {
     position: fixed;
     top: 0; left: 0;
     width: 100%; height: 100%;
@@ -46,20 +48,23 @@
     z-index: 0;
   }
 
-  .star {
+  .firefly {
     position: absolute;
-    background: white;
+    background: radial-gradient(circle, rgba(255,220,180,0.9) 0%, rgba(255,200,150,0.4) 40%, transparent 70%);
     border-radius: 50%;
-    animation: twinkle var(--dur) ease-in-out infinite;
+    animation: fireflyFloat var(--dur) ease-in-out infinite;
     animation-delay: var(--delay);
     opacity: 0;
   }
 
-  @keyframes twinkle {
-    0%, 100% { opacity: 0.2; transform: scale(1); }
-    50% { opacity: 1; transform: scale(1.8); }
+  @keyframes fireflyFloat {
+    0%, 100% { opacity: 0.15; transform: translateY(0) scale(1); }
+    25% { opacity: 0.7; transform: translateY(-15px) scale(1.6); }
+    50% { opacity: 0.3; transform: translateY(-5px) scale(1.2); }
+    75% { opacity: 0.8; transform: translateY(-20px) scale(1.8); }
   }
 
+  /* Text container */
   .text-stage {
     position: fixed;
     top: 0; left: 0;
@@ -73,45 +78,54 @@
   }
 
   .message {
-    font-size: clamp(20px, 5vw, 36px);
-    font-weight: bold;
+    font-size: clamp(22px, 5.5vw, 38px);
+    font-weight: normal;
     text-align: center;
-    line-height: 1.6;
-    padding: 0 20px;
-    background: linear-gradient(90deg, #ff6b6b, #ffa64d, #ffe359, #6bce6b, #6bb5ff, #c06bff, #ff6b6b);
-    background-size: 300% 100%;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    text-shadow: none;
-    filter: drop-shadow(0 0 12px rgba(255,180,180,0.6));
+    line-height: 1.8;
+    letter-spacing: 0.06em;
+    padding: 0 24px;
+    color: #c05a40;
+    text-shadow: 0 1px 3px rgba(180,100,70,0.12);
     opacity: 0;
-    transform: translateY(20px) scale(0.9);
-    animation: textReveal 3s cubic-bezier(0.22, 0.61, 0.36, 1) 4.2s forwards;
-    animation-play-state: paused;
+    transform: translateY(20px) scale(0.92);
   }
 
   .message.show {
-    animation-play-state: running;
+    animation: textReveal 2.8s cubic-bezier(0.22, 0.61, 0.36, 1) 0s forwards;
+  }
+
+  .message.fade-out {
+    animation: textFadeOut 1.2s ease forwards;
   }
 
   @keyframes textReveal {
-    0% { opacity: 0; transform: translateY(20px) scale(0.9); filter: blur(8px); }
-    15% { opacity: 1; transform: translateY(0) scale(1.02); filter: blur(0); }
-    25% { transform: translateY(-4px) scale(1); }
+    0% { opacity: 0; transform: translateY(24px) scale(0.92); filter: blur(6px); }
+    12% { opacity: 1; transform: translateY(0) scale(1.01); filter: blur(0); }
+    22% { transform: translateY(-3px) scale(1); }
     100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
   }
 
-  @keyframes rainbowShift {
-    0% { background-position: 0% 50%; }
-    100% { background-position: 300% 50%; }
+  @keyframes textFadeOut {
+    0% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+    100% { opacity: 0; transform: translateY(-18px) scale(1.04); filter: blur(6px); }
   }
 
-  .message.show {
-    animation: textReveal 3s cubic-bezier(0.22, 0.61, 0.36, 1) 0s forwards,
-               rainbowShift 4s linear 0.3s infinite;
+  /* Decorative line under text */
+  .text-line {
+    margin-top: 16px;
+    width: 60px;
+    height: 1.5px;
+    background: linear-gradient(90deg, transparent, #d49580, #e8b8a8, #d49580, transparent);
+    border-radius: 1px;
+    opacity: 0;
+    transition: opacity 0.6s 0.8s;
   }
 
+  .text-line.show {
+    opacity: 1;
+  }
+
+  /* Heart */
   .heart-stage {
     position: fixed;
     top: 0; left: 0;
@@ -122,7 +136,7 @@
     pointer-events: none;
     z-index: 4;
     opacity: 0;
-    transition: opacity 1s ease;
+    transition: opacity 1.2s ease;
   }
 
   .heart-stage.show {
@@ -130,26 +144,29 @@
   }
 
   .heart-svg {
-    animation: heartbeat 0.8s ease-in-out infinite;
+    animation: heartbeat 0.9s ease-in-out infinite;
   }
 
   @keyframes heartbeat {
     0% { transform: scale(1); }
-    14% { transform: scale(1.15); }
+    14% { transform: scale(1.12); }
     28% { transform: scale(1); }
-    42% { transform: scale(1.1); }
+    42% { transform: scale(1.08); }
     56% { transform: scale(1); }
-    70% { transform: scale(1.05); }
+    70% { transform: scale(1.04); }
     100% { transform: scale(1); }
   }
 
+  /* Hint */
   .hint {
     position: fixed;
-    bottom: 40px;
+    bottom: 44px;
     width: 100%;
     text-align: center;
-    color: rgba(255,255,255,0.4);
-    font-size: 14px;
+    color: rgba(180,120,100,0.5);
+    font-size: 13px;
+    font-family: "STKaiti", "KaiTi", "楷体", serif;
+    letter-spacing: 0.08em;
     z-index: 5;
     pointer-events: none;
     opacity: 0;
@@ -163,23 +180,30 @@
 </head>
 <body>
 
-<div class="stars" id="stars"></div>
+<!-- Warm firefly background -->
+<div class="fireflies" id="fireflies"></div>
+
+<!-- Canvas for fireworks and petals -->
 <canvas id="canvas"></canvas>
 
+<!-- Text -->
 <div class="text-stage">
-  <div class="message" id="message">祝妈妈母亲节快乐<br>永远年轻美丽！</div>
+  <div class="message" id="message">祝妈妈母亲节快乐<br>永远年轻美丽</div>
+  <div class="text-line" id="textLine"></div>
 </div>
 
+<!-- Heart -->
 <div class="heart-stage" id="heartStage">
   <svg class="heart-svg" width="140" height="130" viewBox="0 0 140 130">
     <defs>
-      <radialGradient id="heartGlow" cx="50%" cy="40%" r="50%">
-        <stop offset="0%" stop-color="#ff9eb5"/>
-        <stop offset="60%" stop-color="#e8486a"/>
-        <stop offset="100%" stop-color="#c03050"/>
+      <radialGradient id="heartGlow" cx="50%" cy="38%" r="55%">
+        <stop offset="0%" stop-color="#ffb8b0"/>
+        <stop offset="45%" stop-color="#f09080"/>
+        <stop offset="80%" stop-color="#e07060"/>
+        <stop offset="100%" stop-color="#c05048"/>
       </radialGradient>
       <filter id="glow">
-        <feGaussianBlur stdDeviation="4" result="blur"/>
+        <feGaussianBlur stdDeviation="3.5" result="blur"/>
         <feMerge>
           <feMergeNode in="blur"/>
           <feMergeNode in="SourceGraphic"/>
@@ -191,16 +215,18 @@
   </svg>
 </div>
 
-<div class="hint" id="hint">轻触屏幕重播</div>
+<!-- Hint -->
+<div class="hint" id="hint">轻触屏幕 · 再次播放</div>
 
 <script>
 (function() {
   const canvas = document.getElementById('canvas');
   const ctx = canvas.getContext('2d');
   const message = document.getElementById('message');
+  const textLine = document.getElementById('textLine');
   const heartStage = document.getElementById('heartStage');
   const hint = document.getElementById('hint');
-  const starsContainer = document.getElementById('stars');
+  const firefliesContainer = document.getElementById('fireflies');
 
   let W, H;
   let fireworks = [];
@@ -213,6 +239,7 @@
   let textShown = false;
   let heartShown = false;
 
+  // Resize
   function resize() {
     W = canvas.width = window.innerWidth;
     H = canvas.height = window.innerHeight;
@@ -220,114 +247,108 @@
   window.addEventListener('resize', resize);
   resize();
 
-  function createStars() {
+  // Create warm fireflies
+  function createFireflies() {
     const frag = document.createDocumentFragment();
-    for (let i = 0; i < 120; i++) {
-      const star = document.createElement('div');
-      star.className = 'star';
-      const size = Math.random() * 2.5 + 0.5;
-      star.style.cssText =
-        'left: ' + (Math.random() * 100) + '%;' +
-        'top: ' + (Math.random() * 70) + '%;' +
-        'width: ' + size + 'px;' +
-        'height: ' + size + 'px;' +
-        '--dur: ' + (Math.random() * 2 + 1.5) + 's;' +
-        '--delay: ' + (Math.random() * 3) + 's;';
-      frag.appendChild(star);
+    for (let i = 0; i < 80; i++) {
+      const ff = document.createElement('div');
+      ff.className = 'firefly';
+      const size = Math.random() * 4 + 2;
+      ff.style.cssText = `
+        left: ${Math.random() * 100}%;
+        top: ${Math.random() * 65}%;
+        width: ${size}px;
+        height: ${size}px;
+        --dur: ${Math.random() * 2.5 + 2}s;
+        --delay: ${Math.random() * 4}s;
+      `;
+      frag.appendChild(ff);
     }
-    starsContainer.appendChild(frag);
+    firefliesContainer.appendChild(frag);
   }
-  createStars();
+  createFireflies();
 
-  function createFirework(x, y, colors) {
-    const count = 80 + Math.floor(Math.random() * 60);
-    const parts = [];
+  // Firework particle
+  function createFirework(x, y, palette) {
+    const count = 70 + Math.floor(Math.random() * 50);
+    const pts = [];
     for (let i = 0; i < count; i++) {
       const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.3;
-      const speed = Math.random() * 6 + 2;
-      const life = 1.2 + Math.random() * 1.5;
-      parts.push({
-        x: x, y: y,
+      const speed = Math.random() * 5.5 + 2;
+      const life = 1.0 + Math.random() * 1.4;
+      const color = palette[Math.floor(Math.random() * palette.length)];
+      pts.push({
+        x, y,
         vx: Math.cos(angle) * speed,
         vy: Math.sin(angle) * speed,
-        life: life,
+        life,
         maxLife: life,
-        color: colors[Math.floor(Math.random() * colors.length)],
+        color,
         size: Math.random() * 2.5 + 0.8
       });
     }
-    return parts;
+    return pts;
   }
 
+  function createTrail(x, y, targetX, targetY) {
+    return {
+      x, y, targetX, targetY,
+      progress: 0,
+      speed: 0.015 + Math.random() * 0.018,
+      size: Math.random() * 2 + 1,
+      life: 0.5 + Math.random() * 0.4,
+      maxLife: 0
+    };
+  }
+
+  // Launch a firework — warm palettes
   function launchFirework() {
-    const x = W * 0.15 + Math.random() * W * 0.7;
-    const y = H * 0.15 + Math.random() * H * 0.35;
+    const x = W * 0.12 + Math.random() * W * 0.76;
+    const y = H * 0.12 + Math.random() * H * 0.32;
     const palettes = [
-      ['#ff6b6b', '#ff8e8e', '#ffaaaa', '#ffd93d'],
-      ['#ffa64d', '#ffc97a', '#ffe0a0', '#ff6b6b'],
-      ['#c06bff', '#da8fff', '#f0c0ff', '#6bb5ff', '#ffd93d']
+      ['#f4a88a', '#f7bfa0', '#fcd5b8', '#f0c060', '#f8d080'],
+      ['#e8947a', '#f0b098', '#f8ccb8', '#f4b860', '#fad890'],
+      ['#f0a0a8', '#f4bcc0', '#fad8d8', '#f4c870', '#f8e090'],
     ];
     const palette = palettes[fireworkCount % 3];
+
     const startX = x;
     const startY = H + 20;
-    const trailP = {
-      x: startX, y: startY,
-      targetX: x, targetY: y,
-      progress: 0,
-      speed: 0.015 + Math.random() * 0.02,
-      life: 0.6 + Math.random() * 0.4
-    };
-    trails.push({
-      trail: trailP,
-      particles: createFirework(x, y, palette)
-    });
+    const trail = createTrail(startX, startY, x, y);
+    trails.push({ trail, particles: createFirework(x, y, palette), x, y, palette });
   }
 
-  function createFloatingParticle() {
+  // Floating petal
+  function createPetal() {
     return {
       x: Math.random() * W,
-      y: -10,
-      vx: (Math.random() - 0.5) * 1.5,
-      vy: Math.random() * 1.5 + 0.5,
-      size: Math.random() * 5 + 3,
+      y: -15,
+      vx: (Math.random() - 0.5) * 1.2,
+      vy: Math.random() * 1.2 + 0.4,
+      size: Math.random() * 7 + 4,
       rotation: Math.random() * 360,
-      rotSpeed: (Math.random() - 0.5) * 3,
-      opacity: Math.random() * 0.6 + 0.4,
-      type: Math.random() > 0.5 ? 'petal' : 'star',
-      color: Math.random() > 0.5 ? '#ffb3c6' : '#ffd93d',
+      rotSpeed: (Math.random() - 0.5) * 2.5,
+      opacity: Math.random() * 0.45 + 0.35,
+      color: ['#fcd5c0', '#f8c8b8', '#fdd8cc', '#ffe4d8', '#f8d0c0'][Math.floor(Math.random() * 5)],
       wobble: Math.random() * Math.PI * 2,
-      wobbleSpeed: Math.random() * 0.02 + 0.01,
-      wobbleAmp: Math.random() * 1.5 + 0.5
+      wobbleSpeed: Math.random() * 0.015 + 0.008,
+      wobbleAmp: Math.random() * 1.2 + 0.4
     };
   }
 
-  function drawHeartParticle(ctx, p) {
+  function drawPetal(ctx, p) {
     ctx.save();
     ctx.globalAlpha = p.opacity;
     ctx.fillStyle = p.color;
     ctx.translate(p.x, p.y);
     ctx.rotate(p.rotation * Math.PI / 180);
-    if (p.type === 'star') {
-      const s = p.size;
-      ctx.beginPath();
-      ctx.moveTo(0, -s);
-      ctx.lineTo(s * 0.3, -s * 0.3);
-      ctx.lineTo(s, 0);
-      ctx.lineTo(s * 0.3, s * 0.3);
-      ctx.lineTo(0, s);
-      ctx.lineTo(-s * 0.3, s * 0.3);
-      ctx.lineTo(-s, 0);
-      ctx.lineTo(-s * 0.3, -s * 0.3);
-      ctx.closePath();
-      ctx.fill();
-    } else {
-      ctx.beginPath();
-      ctx.ellipse(0, 0, p.size * 0.5, p.size, 0, 0, Math.PI * 2);
-      ctx.fill();
-    }
+    ctx.beginPath();
+    ctx.ellipse(0, 0, p.size * 0.4, p.size, 0, 0, Math.PI * 2);
+    ctx.fill();
     ctx.restore();
   }
 
+  // Animation loop
   function animate(timestamp) {
     animationId = requestAnimationFrame(animate);
     ctx.clearRect(0, 0, W, H);
@@ -336,32 +357,38 @@
 
     const elapsed = (timestamp - stageStartTime) / 1000;
 
+    // Stage: fireworks
     if (stage === 'fireworks') {
-      if (fireworkCount < 3 && elapsed > fireworkCount * 1.0 + 0.3 && trails.length === 0) {
+      if (fireworkCount < 3 && elapsed > fireworkCount * 0.95 + 0.25 && trails.length === 0) {
         launchFirework();
         fireworkCount++;
       }
-      if (fireworkCount >= 3 && elapsed > 4.2 && !textShown) {
+
+      if (fireworkCount >= 3 && elapsed > 4.0 && !textShown) {
         textShown = true;
         message.classList.add('show');
+        textLine.classList.add('show');
         stage = 'text';
         stageStartTime = timestamp;
       }
     }
 
-    if (stage === 'text' && elapsed > 2.8 && !heartShown) {
+    // Stage: text → heart transition
+    if (stage === 'text' && elapsed > 2.5 && !heartShown) {
       heartShown = true;
+      message.classList.add('fade-out');
       heartStage.classList.add('show');
       hint.classList.add('show');
       stage = 'heart';
       stageStartTime = timestamp;
-      for (let i = 0; i < 30; i++) {
-        const p = createFloatingParticle();
+      for (let i = 0; i < 25; i++) {
+        const p = createPetal();
         p.y = Math.random() * H;
         particles.push(p);
       }
     }
 
+    // Draw trails
     for (let i = trails.length - 1; i >= 0; i--) {
       const t = trails[i];
       const tr = t.trail;
@@ -374,23 +401,24 @@
       const eased = 1 - Math.pow(1 - tr.progress, 3);
       const cx = tr.x + (tr.targetX - tr.x) * eased;
       const cy = tr.y + (tr.targetY - tr.y) * eased;
-      ctx.fillStyle = '#ffd93d';
-      ctx.shadowColor = '#ffd93d';
-      ctx.shadowBlur = 8;
+      ctx.fillStyle = '#f8d090';
+      ctx.shadowColor = '#f8d090';
+      ctx.shadowBlur = 6;
       ctx.beginPath();
-      ctx.arc(cx, cy, 2, 0, Math.PI * 2);
+      ctx.arc(cx, cy, 1.8, 0, Math.PI * 2);
       ctx.fill();
       ctx.shadowBlur = 0;
     }
 
+    // Draw firework particles
     for (let i = fireworks.length - 1; i >= 0; i--) {
       const fw = fireworks[i];
       fw.time += 1 / 60;
       let alive = false;
       for (const p of fw.particles) {
-        p.x += p.vx * 0.7;
-        p.y += p.vy * 0.7;
-        p.vy += 0.04;
+        p.x += p.vx * 0.65;
+        p.y += p.vy * 0.65;
+        p.vy += 0.035;
         p.vx *= 0.99;
         p.vy *= 0.99;
         p.life -= 1 / 60;
@@ -400,7 +428,7 @@
         ctx.fillStyle = p.color;
         ctx.globalAlpha = alpha;
         ctx.shadowColor = p.color;
-        ctx.shadowBlur = 4;
+        ctx.shadowBlur = 3;
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size * alpha, 0, Math.PI * 2);
         ctx.fill();
@@ -410,30 +438,34 @@
       if (!alive) fireworks.splice(i, 1);
     }
 
+    // Heart stage: petals
     if (stage === 'heart') {
-      if (Math.random() < 0.4) {
-        particles.push(createFloatingParticle());
+      if (Math.random() < 0.35) {
+        particles.push(createPetal());
       }
       for (let i = particles.length - 1; i >= 0; i--) {
         const p = particles[i];
         p.y += p.vy;
-        p.x += p.vx + Math.sin(p.wobble) * p.wobbleAmp * 0.3;
+        p.x += p.vx + Math.sin(p.wobble) * p.wobbleAmp * 0.25;
         p.wobble += p.wobbleSpeed;
         p.rotation += p.rotSpeed;
-        if (p.y > H + 20 || p.x < -20 || p.x > W + 20) {
+        if (p.y > H + 25 || p.x < -25 || p.x > W + 25) {
           particles.splice(i, 1);
         } else {
-          drawHeartParticle(ctx, p);
+          drawPetal(ctx, p);
         }
       }
-      const glow = ctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, Math.min(W, H) * 0.35);
-      glow.addColorStop(0, 'rgba(255,120,150,0.06)');
+
+      // Warm ambient glow
+      const glow = ctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, Math.min(W, H) * 0.3);
+      glow.addColorStop(0, 'rgba(255,200,180,0.05)');
       glow.addColorStop(1, 'rgba(0,0,0,0)');
       ctx.fillStyle = glow;
       ctx.fillRect(0, 0, W, H);
     }
   }
 
+  // Start sequence
   function startSequence() {
     fireworks = [];
     trails = [];
@@ -441,11 +473,13 @@
     fireworkCount = 0;
     textShown = false;
     heartShown = false;
-    message.classList.remove('show');
+    message.classList.remove('show', 'fade-out');
+    textLine.classList.remove('show');
     heartStage.classList.remove('show');
     hint.classList.remove('show');
     stage = 'fireworks';
     stageStartTime = performance.now();
+
     if (!animationId) {
       animationId = requestAnimationFrame(animate);
     }
@@ -454,13 +488,13 @@
   resize();
   startSequence();
 
-  document.addEventListener('click', function() {
+  document.addEventListener('click', () => {
     if (stage === 'heart' || stage === 'text') {
       startSequence();
     }
   });
 
-  document.addEventListener('touchstart', function(e) {
+  document.addEventListener('touchstart', (e) => {
     if (stage === 'heart' || stage === 'text') {
       e.preventDefault();
       startSequence();
