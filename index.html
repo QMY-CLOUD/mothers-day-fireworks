@@ -485,19 +485,136 @@
     }
   }
 
+  // ========== BGM: gentle music-box melody (Web Audio API) ==========
+  let audioCtx = null;
+  let bgmPlaying = false;
+  let bgmNodes = [];
+  let bgmScheduleTimer = null;
+
+  const pentatonic = {
+    'C4': 261.63, 'D4': 293.66, 'E4': 329.63, 'G4': 392.00, 'A4': 440.00,
+    'C5': 523.25, 'D5': 587.33, 'E5': 659.25, 'G5': 784.00, 'A5': 880.00
+  };
+
+  const melody = [
+    ['E4', 2], ['G4', 2], ['A4', 3], ['G4', 1],
+    ['E4', 2], ['D4', 2], ['C4', 4],
+    ['E4', 2], ['G4', 2], ['A4', 2], ['C5', 2],
+    ['D5', 3], ['A4', 1], ['G4', 4],
+    ['A4', 2], ['G4', 2], ['E4', 2], ['D4', 2],
+    ['C4', 2], ['D4', 2], ['E4', 2], ['G4', 2],
+    ['A4', 3], ['G4', 1], ['E4', 4],
+  ];
+
+  const bpm = 68;
+  const beatSec = 60 / bpm;
+
+  function initAudio() {
+    if (audioCtx) return;
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+
+  function playNote(freq, startTime, duration, vol) {
+    if (!audioCtx) return;
+    const t = audioCtx.currentTime + startTime;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    const filter = audioCtx.createBiquadFilter();
+    osc.type = 'triangle';
+    osc.frequency.value = freq;
+    filter.type = 'lowpass';
+    filter.frequency.value = 1800;
+    filter.Q.value = 0.5;
+    gain.gain.setValueAtTime(0, t);
+    gain.gain.linearRampToValueAtTime(vol, t + 0.04);
+    gain.gain.setValueAtTime(vol, t + duration * 0.7);
+    gain.gain.linearRampToValueAtTime(0, t + duration);
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start(t);
+    osc.stop(t + duration + 0.1);
+    bgmNodes.push(osc);
+    osc.onended = () => {
+      const idx = bgmNodes.indexOf(osc);
+      if (idx > -1) bgmNodes.splice(idx, 1);
+    };
+  }
+
+  function playPad(freq, startTime, duration, vol) {
+    if (!audioCtx) return;
+    const t = audioCtx.currentTime + startTime;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0, t);
+    gain.gain.linearRampToValueAtTime(vol, t + 0.3);
+    gain.gain.linearRampToValueAtTime(0, t + duration);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start(t);
+    osc.stop(t + duration + 0.1);
+    bgmNodes.push(osc);
+  }
+
+  function scheduleMelody() {
+    if (!bgmPlaying || !audioCtx) return;
+    const totalBeats = melody.reduce((sum, [, b]) => sum + b, 0);
+    const loopSec = totalBeats * beatSec;
+    let noteTime = 0;
+    for (const [note, beats] of melody) {
+      const dur = beats * beatSec * 0.85;
+      playNote(pentatonic[note], noteTime, dur, 0.10);
+      noteTime += beats * beatSec;
+    }
+    playPad(130.81, 0, loopSec, 0.04);
+    playPad(261.63, 0, loopSec, 0.03);
+    bgmScheduleTimer = setTimeout(scheduleMelody, loopSec * 1000 - 50);
+  }
+
+  function startBGM() {
+    initAudio();
+    if (!audioCtx || bgmPlaying) return;
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    bgmPlaying = true;
+    scheduleMelody();
+  }
+
+  function stopBGM() {
+    bgmPlaying = false;
+    if (bgmScheduleTimer) clearTimeout(bgmScheduleTimer);
+    for (const node of bgmNodes) {
+      try { node.stop(); } catch(e) {}
+    }
+    bgmNodes = [];
+  }
+
+  function handleFirstInteraction() {
+    startBGM();
+    document.removeEventListener('click', handleFirstInteraction);
+    document.removeEventListener('touchstart', handleFirstInteraction);
+  }
+  document.addEventListener('click', handleFirstInteraction);
+  document.addEventListener('touchstart', handleFirstInteraction, { passive: true });
+
   resize();
   startSequence();
 
   document.addEventListener('click', () => {
     if (stage === 'heart' || stage === 'text') {
+      stopBGM();
       startSequence();
+      startBGM();
     }
   });
 
   document.addEventListener('touchstart', (e) => {
     if (stage === 'heart' || stage === 'text') {
       e.preventDefault();
+      stopBGM();
       startSequence();
+      startBGM();
     }
   }, { passive: false });
 
